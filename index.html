@@ -78,52 +78,44 @@
 
 <script>
 
-  // BURAYI DEĞİŞTİR
-  // const supabaseUrl = 'https://PROJE_ID.supabase.co';
-  const supabaseUrl = "https://dumzxgwuzzuasdlqrytw.supabase.co/";
+  // --- CONFIG: replace these with your Supabase project values ---
+  // Get them from Supabase project Settings -> API
+  const supabaseUrl = "https://dumzxgwuzzuasdlqrytw.supabase.co"; // remove any /rest/v1 suffix
+  const supabaseKey = '<ANON_PUBLIC_KEY>'; // REPLACE with your project's anon/public key
 
-  // BURAYI DEĞİŞTİR
-  // const supabaseKey = 'ANON_PUBLIC_KEY';
-  const supabaseKey = 'sb_publishable_rout-nyMOoH7Sm5YLzLhOA_2N9iHgdp';
-
-  const supabaseClient = supabase.createClient(
-    supabaseUrl,
-    supabaseKey
-  );
+  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
   const cevapAnahtari = {
-	A: `
-	A kitapçığı açıklaması:
-	S 1, 2, 3: Grafikli Soru
-	Soru 4, 5, 6: f(x)=...e^x // 1. ve 2. türev
-  	S 7: Ln ... ^3 fonksiyon türevi
-	S 8: Polinom fonksiyon grafik teğeti
-	S 9, 10: 3x3 Matris determinantı ve kofaktör
-	Soru 11: e^f(x) fonksiyon integrali
-	Soru 12, 13, 14, 15: AC, MC, Kar fonksiyonu
-	S 16, 17: Doğrusal Denklem sistemi, ters matris çözümü
-	S 18: Birim matris bilgi sorusu
-	S 19, 20: AC ve MC dönüşüm türev
-	S 21: Belirli integral çözümü
-	S 22, 23: Kesirli İntegral çözümü
-    `,
-    
-	B: `
-	B kitapçığı açıklaması:
-	S 1: Belirli integral çözümü
-	S 2, 3: Kesirli İntegral çözümü `
-  	Soru 4, 5, 6: f(x)=...e^x // 1. ve 2. türev
-  	S 7, 8: Doğrusal Denklem sistemi, ters matris çözümü
-  	S 9, 10: 3x3 Matris determinantı ve kofaktör
-  	Soru 11: e^f(x) fonksiyon integrali
-  	Soru 12, 13, 14, 15: AC, MC, Kar fonksiyonu
-  	S 16: Ln ... ^3 fonksiyon türevi
-	S 17: Polinom fonksiyon grafik teğeti
-	S 18: Birim matris bilgi sorusu
-  	S 19, 20: AC ve MC dönüşüm türev
-  	S 21, 22, 23: Grafikli Soru
-	};  
-  
+    A: `A kitapçığı açıklaması:
+S 1, 2, 3: Grafikli Soru
+Soru 4, 5, 6: f(x)=...e^x // 1. ve 2. türev
+S 7: Ln ... ^3 fonksiyon türevi
+S 8: Polinom fonksiyon grafik teğeti
+S 9, 10: 3x3 Matris determinantı ve kofaktör
+Soru 11: e^f(x) fonksiyon integrali
+Soru 12, 13, 14, 15: AC, MC, Kar fonksiyonu
+S 16, 17: Doğrusal Denklem sistemi, ters matris çözümü
+S 18: Birim matris bilgi sorusu
+S 19, 20: AC ve MC dönüşüm türev
+S 21: Belirli integral çözümü
+S 22, 23: Kesirli İntegral çözümü
+`,
+    B: `B kitapçığı açıklaması:
+S 1: Belirli integral çözümü
+S 2, 3: Kesirli İntegral çözümü
+Soru 4, 5, 6: f(x)=...e^x // 1. ve 2. türev
+S 7, 8: Doğrusal Denklem sistemi, ters matris çözümü
+S 9, 10: 3x3 Matris determinantı ve kofaktör
+Soru 11: e^f(x) fonksiyon integrali
+S 12, 13, 14, 15: AC, MC, Kar fonksiyonu
+S 16: Ln ... ^3 fonksiyon türevi
+S 17: Polinom fonksiyon grafik teğeti
+S 18: Birim matris bilgi sorusu
+S 19, 20: AC ve MC dönüşüm türev
+S 21, 22, 23: Grafikli Soru
+`
+  };
+
   async function sorgula(){
 
     const ogrNo = document
@@ -132,93 +124,109 @@
       .trim();
 
     const adSoyad = document
-      .getElementById("ad_soyad")
+      .getElementById("adSoyad")
       .value
       .trim();
 
     const sonucDiv = document.getElementById("sonuc");
 
+    if(!ogrNo){
+      sonucDiv.innerHTML = `<div class="error">Lütfen öğrenci numarası girin.</div>`;
+      return;
+    }
+
     sonucDiv.innerHTML = "Sorgulanıyor...";
 
-    const { data, error } = await supabaseClient
-      .from('final_haziran26_mat2')
-      .select('*')
-      .eq('no_duzgun', ogrNo)
-      .ilike('ad_soyad', adSoyad)
-      .limit(1);
+    try{
+      // Build query and only add ilike filter if adSoyad provided
+      let query = supabaseClient
+        .from('final_haziran26_mat2')
+        .select('*')
+        .eq('no_duzgun', ogrNo)
+        .limit(1);
 
-    if(error){
-      sonucDiv.innerHTML =
-        `<div class="error">
-          Hata oluştu.
-        </div>`;
+      if(adSoyad){
+        // ilike expects a pattern
+        query = query.ilike('ad_soyad', `%${adSoyad}%`);
+      }
 
-      console.log(error);
-      return;
+      const { data, error } = await query;
+
+      if(error){
+        console.error('Supabase error:', error);
+        sonucDiv.innerHTML = `<div class="error">Hata oluştu: ${error.message || JSON.stringify(error)}</div>`;
+        return;
+      }
+
+      if(!data || data.length === 0){
+        sonucDiv.innerHTML = `<div class="error">Kayıt bulunamadı.</div>`;
+        return;
+      }
+
+      const ogr = data[0];
+
+      // SAYACI ARTIR (optional - make sure your table/column names match and you have permission)
+      try{
+        const yeniSayac = (ogr.sayac || 0) + 1;
+        await supabaseClient
+          .from('final_mat2not')
+          .update({ sayac: yeniSayac })
+          .eq('ogr_no1', ogr.ogr_no1);
+
+        // show yeniSayac even if update fails silently
+        ogr._yeniSayac = yeniSayac;
+      }catch(e){
+        console.warn('Sayac güncellemesi başarısız:', e);
+      }
+
+      const kitapcikText = cevapAnahtari[ogr.kitapcik] || 'Cevap anahtarı bulunamadı.';
+
+      sonucDiv.innerHTML = `
+        <div class="result">
+
+          <h3>Sonuç</h3>
+
+          <p><strong>Öğrenci No:</strong> ${ogr.no_duzgun}</p>
+
+          <p><strong>Ad Soyad:</strong> ${ogr.ad_soyad}</p>
+
+          <p><strong>Ad Soyad Notu:</strong> ${ogr.hata_bildirim || ''}</p>
+
+          <p><strong>Puan:</strong> ${ogr.hesap2son_x5_ek4 || ''}</p>
+
+          <p><strong>Doğru Sayısı:</strong> ${ogr.dogru_sayi || ''}</p>
+
+          <p><strong>Yanlış Sayısı:</strong> ${ogr.yanlis_sayi || ''}</p>
+
+          <p><strong>Verdiğiniz Cevaplar:</strong> ${ogr.Konu1Cev || ''}</p>
+
+          <p><strong>Doğrular1:</strong> ${ogr.dogru_noformul || ''}</p>
+
+          <p><strong>Yanlışlar:</strong> ${ogr.yanlis_noformul || ''}</p>
+
+          <p><strong>Toplam Görüntülenme:</strong> ${ogr._yeniSayac || ogr.sayac || ''}</p>
+
+          <p><strong>Kitapçık:</strong> ${ogr.kitapcik || ''}</p>
+
+          <p><strong>Cevap Anahtarı:</strong></p>
+
+            <div style="
+              background:#f7f7f7;
+              padding:10px;
+              border-radius:5px;
+              white-space:pre-wrap;
+              font-family:monospace;
+            ">
+            ${kitapcikText}
+
+              </div>
+        </div>
+      `;
+
+    }catch(err){
+      console.error('Beklenmeyen hata:', err);
+      document.getElementById('sonuc').innerHTML = `<div class="error">Beklenmeyen hata oluştu. Konsolu kontrol edin.</div>`;
     }
-
-    if(data.length === 0){
-
-      sonucDiv.innerHTML =
-        `<div class="error">
-          Kayıt bulunamadı.
-        </div>`;
-
-      return;
-    }
-
-    const ogr = data[0];
-	// SAYACI ARTIR
-
-	const yeniSayac = (ogr.sayac || 0) + 1;
-	
-	await supabaseClient
-	  .from('final_mat2not')
-	  .update({
-	    sayac: yeniSayac
-	  })
-	  .eq('ogr_no1', ogr.ogr_no1);
-
-    sonucDiv.innerHTML = `
-      <div class="result">
-
-        <h3>Sonuç</h3>
-
-        <p><strong>Öğrenci No:</strong> ${ogr.no_duzgun}</p>
-
-        <p><strong>Ad Soyad:</strong> ${ogr.ad_soyad}</p>
-
-		<p><strong>Ad Soyad Notu:</strong> ${ogr.hata_bildirim}</p>
-
-        <p><strong>Puan:</strong> ${ogr.hesap2son_x5_ek4}</p>
-
-        <p><strong>Doğru Sayısı:</strong> ${ogr.dogru_sayi}</p>
-
-        <p><strong>Yanlış Sayısı:</strong> ${ogr.yanlis_sayi}</p>
-
-        <p><strong>Verdiğiniz Cevaplar:</strong> ${ogr.Konu1Cev}</p>
-
-        <p><strong>Doğrular1:</strong> ${ogr.dogru_noformul}</p>
-
-        <p><strong>Yanlışlar:</strong> ${ogr.yanlis_noformul}</p>
-
-		<p><strong>Toplam Görüntülenme:</strong> ${yeniSayac}</p>
-
-		<p><strong>Kitapçık:</strong> ${ogr.kitapcik}</p>
-
-		<p><strong>Cevap Anahtarı:</strong></p>
-		
-			<div style="
-			  background:#f7f7f7;
-			  padding:10px;
-			  border-radius:5px;
-			  white-space:pre-wrap;
-			  font-family:monospace;
-			">
-			${cevapAnahtari[ogr.kitapcik]}
-		
-		      </div>
-    `;
   }
 
 </script>
