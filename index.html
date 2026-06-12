@@ -80,7 +80,7 @@
 
   // BURAYI DEĞİŞTİR
   // const supabaseUrl = 'https://PROJE_ID.supabase.co';
-  const supabaseUrl = "https://dumzxgwuzzuasdlqrytw.supabase.co/rest/v1/Final_haziran26_mat2";
+  const supabaseUrl = "https://dumzxgwuzzuasdlqrytw.supabase.co/rest/v1/";
 
   // BURAYI DEĞİŞTİR
   // const supabaseKey = 'ANON_PUBLIC_KEY';
@@ -141,7 +141,7 @@
     sonucDiv.innerHTML = "Sorgulanıyor...";
 
     const { data, error } = await supabaseClient
-      .from('Final_haziran26_mat2')
+      .from('final_haziran26_mat2')
       .select('*')
       .eq('no_duzgun', ogrNo)
       .ilike('ad_soyad', adSoyad)
