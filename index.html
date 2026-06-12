@@ -80,41 +80,41 @@
 
   // --- CONFIG: replace these with your Supabase project values ---
   // Get them from Supabase project Settings -> API
-  const supabaseUrl = "https://dumzxgwuzzuasdlqrytw.supabase.co"; // remove any /rest/v1 suffix
-  const supabaseKey = '<ANON_PUBLIC_KEY>'; // REPLACE with your project's anon/public key
+  const supabaseUrl = "https://dumzxgwuzzuasdlqrytw.supabase.co"; // örnek: https://<PROJECT>.supabase.co
+  const supabaseKey = '<ANON_PUBLIC_KEY>'; // REPLACE with your project's anon/public key (do NOT use service_role key)
 
   const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
   const cevapAnahtari = {
     A: `A kitapçığı açıklaması:
-    S 1, 2, 3: Grafikli Soru
-    Soru 4, 5, 6: f(x)=...e^x // 1. ve 2. türev
-    S 7: Ln ... ^3 fonksiyon türevi
-    S 8: Polinom fonksiyon grafik teğeti
-    S 9, 10: 3x3 Matris determinantı ve kofaktör
-    Soru 11: e^f(x) fonksiyon integrali
-    Soru 12, 13, 14, 15: AC, MC, Kar fonksiyonu
-    S 16, 17: Doğrusal Denklem sistemi, ters matris çözümü
-    S 18: Birim matris bilgi sorusu
-    S 19, 20: AC ve MC dönüşüm türev
-    S 21: Belirli integral çözümü
-    S 22, 23: Kesirli İntegral çözümü
-`  ,
+S 1, 2, 3: Grafikli Soru
+Soru 4, 5, 6: f(x)=...e^x // 1. ve 2. türev
+S 7: Ln ... ^3 fonksiyon türevi
+S 8: Polinom fonksiyon grafik teğeti
+S 9, 10: 3x3 Matris determinantı ve kofaktör
+Soru 11: e^f(x) fonksiyon integrali
+Soru 12, 13, 14, 15: AC, MC, Kar fonksiyonu
+S 16, 17: Doğrusal Denklem sistemi, ters matris çözümü
+S 18: Birim matris bilgi sorusu
+S 19, 20: AC ve MC dönüşüm türev
+S 21: Belirli integral çözümü
+S 22, 23: Kesirli İntegral çözümü
+`,
     B: `B kitapçığı açıklaması:
-    B kitapçığı açıklaması:
-    S 1: Belirli integral çözümü
-    S 2, 3: Kesirli İntegral çözümü `
-    Soru 4, 5, 6: f(x)=...e^x // 1. ve 2. türev
-    S 7, 8: Doğrusal Denklem sistemi, ters matris çözümü
-    S 9, 10: 3x3 Matris determinantı ve kofaktör
-    Soru 11: e^f(x) fonksiyon integrali
-    Soru 12, 13, 14, 15: AC, MC, Kar fonksiyonu
-    S 16: Ln ... ^3 fonksiyon türevi
-    S 17: Polinom fonksiyon grafik teğeti
-    S 18: Birim matris bilgi sorusu
-    S 19, 20: AC ve MC dönüşüm türev
-    S 21, 22, 23: Grafikli Soru
-`  };
+S 1: Belirli integral çözümü
+S 2, 3: Kesirli İntegral çözümü
+Soru 4, 5, 6: f(x)=...e^x // 1. ve 2. türev
+S 7, 8: Doğrusal Denklem sistemi, ters matris çözümü
+S 9, 10: 3x3 Matris determinantı ve kofaktör
+Soru 11: e^f(x) fonksiyon integrali
+Soru 12, 13, 14, 15: AC, MC, Kar fonksiyonu
+S 16: Ln ... ^3 fonksiyon türevi
+S 17: Polinom fonksiyon grafik teğeti
+S 18: Birim matris bilgi sorusu
+S 19, 20: AC ve MC dönüşüm türev
+S 21, 22, 23: Grafikli Soru
+`
+  };
 
   async function sorgula(){
 
@@ -132,6 +132,14 @@
 
     if(!ogrNo){
       sonucDiv.innerHTML = `<div class="error">Lütfen öğrenci numarası girin.</div>`;
+      return;
+    }
+
+    // Safety check: warn if anon key not set in the file
+    if(supabaseKey === '<ANON_PUBLIC_KEY>' || !supabaseKey || supabaseKey.trim() === ''){
+      const msg = 'Supabase anon anahtarı index.html içinde ayarlı değil. Lütfen Supabase Dashboard → Settings → API → Project API keys → anon public key\nanahtarını supabaseKey değişkenine yapıştırın.';
+      console.error(msg);
+      sonucDiv.innerHTML = `<div class="error">${msg.replace(/\n/g,'<br>')}</div>`;
       return;
     }
 
