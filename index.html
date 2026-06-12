@@ -187,7 +187,7 @@ S 21, 22, 23: Grafikli Soru
         await supabaseClient
           .from('final_haziran26_mat2')
           .update({ sayac: yeniSayac })
-          .eq('ogr_no1', ogr.ogr_no1);
+          .eq('ogr_no1', ogr.no_duzgun);
 
         // show yeniSayac even if update fails silently
         ogr._yeniSayac = yeniSayac;
