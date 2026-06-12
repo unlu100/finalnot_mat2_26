@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Not Sorgulama</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background:#f4f4f4;
+      padding:40px;
+    }
+
+    .container{
+      max-width:500px;
+      margin:auto;
+      background:white;
+      padding:25px;
+      border-radius:10px;
+      box-shadow:0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input{
+      width:100%;
+      padding:10px;
+      margin-top:10px;
+      margin-bottom:15px;
+      box-sizing:border-box;
+    }
+
+    button{
+      width:100%;
+      padding:12px;
+      background:#0077cc;
+      color:white;
+      border:none;
+      cursor:pointer;
+      border-radius:5px;
+    }
+
+    button:hover{
+      background:#005fa3;
+    }
+
+    .result{
+      margin-top:20px;
+      padding:15px;
+      background:#eef;
+      border-radius:5px;
+    }
+
+    .error{
+      color:red;
+      margin-top:15px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h2>Öğrenci Not Sorgulama</h2>
+
+  <input type="text" id="ogrNo" placeholder="Öğrenci No">
+  
+  <input type="text" id="adSoyad" placeholder="AD SOYAD veya SOYAD AD">
+
+  <button onclick="sorgula()">
+    Sorgula
+  </button>
+
+  <div id="sonuc"></div>
+
+</div>
+
+<script>
+
+  // BURAYI DEĞİŞTİR
+  // const supabaseUrl = 'https://PROJE_ID.supabase.co';
+  const supabaseUrl = "https://dumzxgwuzzuasdlqrytw.supabase.co/rest/v1/Final_haziran26_mat2";
+
+  // BURAYI DEĞİŞTİR
+  // const supabaseKey = 'ANON_PUBLIC_KEY';
+  const supabaseKey = 'sb_publishable_rout-nyMOoH7Sm5YLzLhOA_2N9iHgdp';
+
+  const supabaseClient = supabase.createClient(
+    supabaseUrl,
+    supabaseKey
+  );
+
+  const cevapAnahtari = {
+	A: `
+	A kitapçığı açıklaması:
+	S 1, 2, 3: Grafikli Soru
+	Soru 4, 5, 6: f(x)=...e^x // 1. ve 2. türev
+  S 7: Ln ... ^3 fonksiyon türevi
+	S 8: Polinom fonksiyon grafik teğeti
+	S 9, 10: 3x3 Matris determinantı ve kofaktör
+	Soru 11: e^f(x) fonksiyon integrali
+	Soru 12, 13, 14, 15: AC, MC, Kar fonksiyonu
+	S 16, 17: Doğrusal Denklem sistemi, ters matris çözümü
+	S 18: Birim matris bilgi sorusu
+	S 19, 20: AC ve MC dönüşüm türev
+	S 21: Belirli integral çözümü
+	S 22, 23: Kesirli İntegral çözümü
+    `,
+    
+	B: `
+	B kitapçığı açıklaması:
+	S 1: Belirli integral çözümü
+	S 2, 3: Kesirli İntegral çözümü `
+  Soru 4, 5, 6: f(x)=...e^x // 1. ve 2. türev
+  S 7, 8: Doğrusal Denklem sistemi, ters matris çözümü
+  S 9, 10: 3x3 Matris determinantı ve kofaktör
+  Soru 11: e^f(x) fonksiyon integrali
+  Soru 12, 13, 14, 15: AC, MC, Kar fonksiyonu
+  S 16: Ln ... ^3 fonksiyon türevi
+	S 17: Polinom fonksiyon grafik teğeti
+	S 18: Birim matris bilgi sorusu
+  S 19, 20: AC ve MC dönüşüm türev
+  S 21, 22, 23: Grafikli Soru
+	};  
+  
+  async function sorgula(){
+
+    const ogrNo = document
+      .getElementById("ogrNo")
+      .value
+      .trim();
+
+    const adSoyad = document
+      .getElementById("ad_oyad")
+      .value
+      .trim();
+
+    const sonucDiv = document.getElementById("sonuc");
+
+    sonucDiv.innerHTML = "Sorgulanıyor...";
+
+    const { data, error } = await supabaseClient
+      .from('final_mat2not')
+      .select('*')
+      .eq('no_duzgun', ogrNo)
+      .ilike('ad_soyad', adSoyad)
+      .limit(1);
+
+    if(error){
+      sonucDiv.innerHTML =
+        `<div class="error">
+          Hata oluştu.
+        </div>`;
+
+      console.log(error);
+      return;
+    }
+
+    if(data.length === 0){
+
+      sonucDiv.innerHTML =
+        `<div class="error">
+          Kayıt bulunamadı.
+        </div>`;
+
+      return;
+    }
+
+    const ogr = data[0];
+	// SAYACI ARTIR
+
+	const yeniSayac = (ogr.sayac || 0) + 1;
+	
+	await supabaseClient
+	  .from('final_mat2not')
+	  .update({
+	    sayac: yeniSayac
+	  })
+	  .eq('ogr_no1', ogr.ogr_no1);
+
+    sonucDiv.innerHTML = `
+      <div class="result">
+
+        <h3>Sonuç</h3>
+
+        <p><strong>Öğrenci No:</strong> ${ogr.no_duzgun}</p>
+
+        <p><strong>Ad Soyad:</strong> ${ogr.ad_soyad}</p>
+
+		<p><strong>Ad Soyad Notu:</strong> ${ogr.hata_bildirim}</p>
+
+        <p><strong>Puan:</strong> ${ogr.hesap2son_x5_ek4}</p>
+
+        <p><strong>Doğru Sayısı:</strong> ${ogr.dogru_sayi}</p>
+
+        <p><strong>Yanlış Sayısı:</strong> ${ogr.yanlis_sayi}</p>
+
+        <p><strong>Verdiğiniz Cevaplar:</strong> ${ogr.Konu1Cev}</p>
+
+        <p><strong>Doğrular1:</strong> ${ogr.dogru_noformul}</p>
+
+        <p><strong>Yanlışlar:</strong> ${ogr.yanlis_noformul}</p>
+
+		<p><strong>Toplam Görüntülenme:</strong> ${yeniSayac}</p>
+
+		<p><strong>Kitapçık:</strong> ${ogr.kitapcik}</p>
+
+		<p><strong>Cevap Anahtarı:</strong></p>
+		
+			<div style="
+			  background:#f7f7f7;
+			  padding:10px;
+			  border-radius:5px;
+			  white-space:pre-wrap;
+			  font-family:monospace;
+			">
+			${cevapAnahtari[ogr.kitapcik]}
+		
+		      </div>
+    `;
+  }
+
+</script>
+
+</body>
+</html>
