@@ -63,6 +63,7 @@
 <div class="container">
 
   <h2>Öğrenci Final Not Sorgulama</h2>
+  <p style="font-size:0.85em; color:#666; margin-top:8px;">Not: Optik forma girdiğiniz şekilde; numaranızı doğru şekilde ve SOYADI + ADI biçiminde isim bilgisi girmeniz gerekmektedir.</p>
 
   <input type="text" id="ogrNo" placeholder="Öğrenci No">
   
@@ -148,7 +149,7 @@ S 21, 22, 23: Grafikli Soru
 
     // Safety check: warn if anon key not set in the file
     if(supabaseKey === '<ANON_PUBLIC_KEY>' || !supabaseKey || supabaseKey.trim() === ''){
-      const msg = 'Supabase anon anahtarı index.html içinde ayarlı değil. Lütfen Supabase Dashboard → Settings → API → Project API keys → anon public key\nanahtarını supabaseKey değişkenine yapıştırın.';
+      const msg = 'Supabase anon anahtarı index.html içinde ayarlı değil. Lütfen Supabase Dashboard → Settings → API → Project API keys → anon public key\nanahtarını supabaseKey de[...]'
       console.error(msg);
       sonucDiv.innerHTML = `<div class="error">${msg.replace(/\n/g,'<br>')}</div>`;
       return;
