@@ -77,25 +77,10 @@
 
 </div>
 
-<script> 
-//-- config.js'i buraya ekleyin -->
+<!-- Config dosyasını yükle -->
 <script src="./config.js"></script>
-  
+
 <script>
-
-  //  --- CONFIG: replace these with your Supabase project values ---
-  // -- Get them from Supabase project Settings -- API 
-  // -- const supabaseUrl = "https://dumzxgwuzzuasdlqrytw.supabase.co"; 
-  // örnek: https://<PROJECT>.supabase.co 
-  // -- const supabaseKey = 'eyJhb***' 
-  // REPLACE with your project's anon/public key (do NOT use service_role key) 
-  // IF ANON_KEY DOES SHOWN CLEARLY 
-
-  //- --- CONFIG: replace these with your Supabase project values --- 
-  const supabaseUrl = window.SUPABASE_URL || 'https://dumzxgwuzzuasdlqrytw.supabase.co';
-  const supabaseKey = window.SUPABASE_KEY || '<ANON_PUBLIC_KEY>';
-  
-  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
   const cevapAnahtari = {
     A: `A kitapçığı açıklaması:
@@ -147,9 +132,16 @@ S 21, 22, 23: Grafikli Soru
       return;
     }
 
-    // Safety check: warn if anon key not set in the file
-    if(supabaseKey === '<ANON_PUBLIC_KEY>' || !supabaseKey || supabaseKey.trim() === ''){
-      const msg = 'Supabase anon anahtarı index.html içinde ayarlı değil. Lütfen Supabase Dashboard → Settings → API → Project API keys → anon public key\nanahtarını supabaseKey de[...]'
+    // Safety check: config.js yüklü mü?
+    if(!window.SUPABASE_URL || !window.SUPABASE_KEY){
+      const msg = 'Supabase yapılandırması yüklenmedi. Lütfen config.js dosyasını kontrol edin.';
+      console.error(msg);
+      sonucDiv.innerHTML = `<div class="error">${msg}</div>`;
+      return;
+    }
+
+    if(window.SUPABASE_KEY === '<ANON_PUBLIC_KEY>' || !window.SUPABASE_KEY.trim()){
+      const msg = 'Supabase anon anahtarı config.js içinde ayarlı değil. Lütfen Supabase Dashboard → Settings → API → Project API keys → anon public key anahtarını config.js de ayarlayın.';
       console.error(msg);
       sonucDiv.innerHTML = `<div class="error">${msg.replace(/\n/g,'<br>')}</div>`;
       return;
@@ -158,6 +150,10 @@ S 21, 22, 23: Grafikli Soru
     sonucDiv.innerHTML = "Sorgulanıyor...";
 
     try{
+      const supabaseUrl = window.SUPABASE_URL;
+      const supabaseKey = window.SUPABASE_KEY;
+      const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
       // Build query and only add ilike filter if adSoyad provided
       let query = supabaseClient
         .from('final_haziran26_mat2')
