@@ -1,0 +1,24 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Create config.js
+        run: |
+          cat > config.js << EOF
+          window.SUPABASE_URL = 'https://dumzxgwuzzuasdlqrytw.supabase.co';
+          window.SUPABASE_KEY = '${{ secrets.SUPABASE_KEY }}';
+          EOF
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
