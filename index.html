@@ -113,36 +113,23 @@ S 21, 22, 23: Grafikli Soru
 `
   };
 
-  async function sorgula() {
-    const ogrNo = document.getElementById("ogrNo").value.trim();
-    const adSoyad = document.getElementById("adSoyad").value.trim();
+async function sorgula(){
+
+    const ogrNo = document
+      .getElementById("ogrNo")
+      .value
+      .trim();
+
+    const adSoyad = document
+      .getElementById("adSoyad")
+      .value
+      .trim();
+
     const sonucDiv = document.getElementById("sonuc");
-  
-    if (!ogrNo || !adSoyad) {
-      sonucDiv.innerHTML = `<div class="error">Lütfen hem öğrenci numarası hem de ad-soyad girin.</div>`;
+
+    if(!ogrNo || !adSoyad){
+      sonucDiv.innerHTML = `<div class="error">Lütfen öğrenci numarası girin.</div>`;
       return;
-    }
-  
-      const { data, error } = await supabase
-        .from('final_haziran26_mat2')
-        .select('*')
-        .eq('ogr_no', parseInt(ogrNo))
-        .eq('ad_soyad', adSoyad);
-    
-      if (error) {
-        sonucDiv.innerHTML = "Hata: " + error.message;
-      } else if (data.length === 0) {
-        sonucDiv.innerHTML = "Öğrenci bulunamadı.";
-      } else {
-        const kayit = data[0];
-        sonucDiv.innerHTML = `
-          No: ${kayit.ogr_no}<br>
-          Ad Soyad: ${kayit.ad_soyad}<br>
-          Doğru: ${kayit.dogru}<br>
-          Yanlış: ${kayit.yanlis}<br>
-          Not: ${kayit.not}
-        `;
-      }
     }
 
     // Safety check: config.js yüklü mü?
