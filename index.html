@@ -127,7 +127,7 @@ async function sorgula(){
 
     const sonucDiv = document.getElementById("sonuc");
 
-    if(!ogrNo && !adSoyad){
+    if(!ogrNo || !adSoyad){
       sonucDiv.innerHTML = `<div class="error">Lütfen öğrenci numarası ve AD+SOYAD birlikte giriniz.</div>`;
       return;
     }
